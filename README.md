@@ -1,4 +1,5 @@
-# vm-transfer
+# vm-sync
+A tool for syncing remote disk/image to local disk/image and reset cloud-init config via chroot
 
 Usage vm-transfer
 ```
