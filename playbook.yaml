@@ -1,0 +1,46 @@
+---
+- hosts: all
+  connection: chroot
+  tasks:
+  - name: find netplan files ubuntu
+    find:
+      paths: /etc/netplan
+      patterns: "*"
+    register: files_to_delete
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: delete netplan files ubuntu
+    file:
+      path: "{{ item.path }}"
+      state: absent
+    with_items: "{{ files_to_delete.files }}"
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: delete interface files ubuntu
+    file:
+      path: /etc/network/interfaces
+      state: absent
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+  - name: update cloud-init if ubuntu
+    apt:
+      name: cloud-init
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  
+  - name: update cloud-init if centos
+    yum:
+      name: cloud-init
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == 'CentOS'
+
+  - name: run cloud-init clean
+    shell: cloud-init clean
+
+  - name: perserve hostname
+    replace:
+      path: /etc/cloud/cloud.cfg
+      regexp: '^preserve_hostname: false$'
+      replace: 'preserve_hostname: true'
