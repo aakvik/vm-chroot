@@ -1,5 +1,8 @@
 #!/bin/bash
 
+LOG_FILE="/var/log/vm-transfer.log"
+> "$LOG_FILE"
+
 transfer_data() {
     local hypervisor="$1"
     local spath="$2"
@@ -8,11 +11,11 @@ transfer_data() {
 
     local sshlocal=$(which ssh)
     local ddlocal=$(which dd)
-    local ddremote=$(ssh root@"$hypervisor" which dd)
+    local ddremote=$(ssh -i "$sshkey" root@"$hypervisor" which dd)
 
-    $sshlocal -i $sshkey root@$hypervisor \
-        $ddremote if=$spath bs=4M status=progress | \
-        $ddlocal of=$tpath bs=4M status=progress > vm-transfer.log 2>&1
+    $sshlocal -i "$sshkey" root@"$hypervisor" \
+        "$ddremote" if="$spath" bs=4M status=progress | \
+        "$ddlocal" of="$tpath" bs=4M status=progress > "$LOG_FILE" 2>&1
 }
 
 hypervisor=""
@@ -20,10 +23,11 @@ spath=""
 tpath="/dev/vdb"
 sshkey=""
 
-available_options_msg="Available options:
+options="Available options:
   --hypervisor | -H : Specify the hypervisor address.
   --spath      | -S : Specify the source path for the data to be transferred.
-  --tpath      | -T : Specify the target path where the data will be transferred."
+  --tpath      | -T : Specify the target path where the data will be transferred.
+  --sshkey     | -K : Specify the SSH key path for authentication."
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -45,7 +49,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo "Unknown option: $1"
-	    echo "$available_options_msg"
+	    echo "$options"
             exit 1
             ;;
     esac
@@ -67,10 +71,12 @@ if [[ -z "$spath" ]]; then
     exit 1
 fi
 
-if [[ -z "$sshkey" ]]; then
-    echo "Please provide sshkey using --sshkey or -K."
+if [[ -z "$sshkey" ]] || [ ! -f "$sshkey" ]; then
+    echo "SSH key path is not specified or does not exist. Please provide a valid sshkey using --sshkey or -K."
     exit 1
 fi
 
 transfer_data "$hypervisor" "$spath" "$tpath" "$sshkey"
 
+parent_script_path=$(dirname "$0")
+/bin/bash "$parent_script_path/vm-chroot"
