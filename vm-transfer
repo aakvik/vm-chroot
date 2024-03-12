@@ -1,0 +1,76 @@
+#!/bin/bash
+
+transfer_data() {
+    local hypervisor="$1"
+    local spath="$2"
+    local tpath="$3"
+    local sshkey="$4"
+
+    local sshlocal=$(which ssh)
+    local ddlocal=$(which dd)
+    local ddremote=$(ssh root@"$hypervisor" which dd)
+
+    $sshlocal -i $sshkey root@$hypervisor \
+        $ddremote if=$spath bs=4M status=progress | \
+        $ddlocal of=$tpath bs=4M status=progress > vm-transfer.log 2>&1
+}
+
+hypervisor=""
+spath=""
+tpath="/dev/vdb"
+sshkey=""
+
+available_options_msg="Available options:
+  --hypervisor | -H : Specify the hypervisor address.
+  --spath      | -S : Specify the source path for the data to be transferred.
+  --tpath      | -T : Specify the target path where the data will be transferred."
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --hypervisor | -H)
+            shift
+            hypervisor="$1"
+            ;;
+        --spath | -S)
+            shift
+            spath="$1"
+            ;;
+        --tpath | -T)
+            shift
+            tpath="$1"
+            ;;
+        --sshkey | -K)
+            shift
+            sshkey="$1"
+            ;;
+        *)
+            echo "Unknown option: $1"
+	    echo "$available_options_msg"
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [[ "$tpath" == "/dev/vdb" ]] && [ ! -e "/dev/vdb" ]; then
+    echo "Target path is not specified and default path $tpath does not exist. Aborting."
+    exit 1
+fi
+
+if [[ -z "$hypervisor" ]]; then
+    echo "Please provide hypervisor using --hypervisor or -H."
+    exit 1
+fi
+
+if [[ -z "$spath" ]]; then
+    echo "Please provide source path using --spath or -S."
+    exit 1
+fi
+
+if [[ -z "$sshkey" ]]; then
+    echo "Please provide sshkey using --sshkey or -K."
+    exit 1
+fi
+
+transfer_data "$hypervisor" "$spath" "$tpath" "$sshkey"
+
