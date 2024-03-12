@@ -7,7 +7,7 @@ vm-transfer -H <hypervisor_address> -S <source_path> -T <target_path> -K <path_t
 Available options:
   --hypervisor | -H : Specify the hypervisor address.
   --spath      | -S : Specify the source path for the data to be transferred.
-  --tpath      | -T : Specify the target path where the data will be transferred.
+  --tpath      | -T : Specify the target path where the data will be transferred. (defaults to /dev/vdb)
   --sshkey     | -K : Specify the SSH key path for authentication."
 ```
 
