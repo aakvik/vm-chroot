@@ -22,7 +22,6 @@ check_exit_status() {
 		log "Error: Expected exit status code $expected_code, but received $exit_code"
         	return 1
 	fi
-
 }
 
 mount_chroot() {
@@ -66,7 +65,6 @@ unmount_chroot() {
     	check_exit_status "$?" 0 || return 1
     	log "unmounted chroot successfully"
 }
-
 
 main() {
 	log "starting volume update..."
