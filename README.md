@@ -2,7 +2,7 @@
 
 Usage vm-transfer
 ```
-vm-transfer --hypervisor <hypervisor_address> --spath <source_path> --tpath <target_path> --sshkey <path_to_sshkey>
+vm-transfer -H <hypervisor_address> -S <source_path> -T <target_path> -K <path_to_sshkey>
 
 Available options:
   --hypervisor | -H : Specify the hypervisor address.
