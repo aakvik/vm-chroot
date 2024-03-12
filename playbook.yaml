@@ -39,7 +39,7 @@
   - name: run cloud-init clean
     shell: cloud-init clean
 
-  - name: perserve hostname
+  - name: preserve hostname
     replace:
       path: /etc/cloud/cloud.cfg
       regexp: '^preserve_hostname: false$'
