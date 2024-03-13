@@ -67,7 +67,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ "$tpath" == "/dev/vdb" ]] && [ ! -e "/dev/vdb" ]; then
-    echo "Target path is not specified and default path $tpath does not exist. Aborting."
+    echo "Default path $tpath does not exist. Aborting."
     exit 1
 fi
 
