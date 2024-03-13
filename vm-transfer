@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o pipefail
+
 LOG_FILE="/var/log/vm-transfer.log"
 > "$LOG_FILE"
 
@@ -16,7 +18,8 @@ transfer_data() {
     $sshlocal -i "$sshkey" root@"$hypervisor" \
         "$ddremote" if="$spath" bs=4M status=progress | \
         "$ddlocal" of="$tpath" bs=4M status=progress > "$LOG_FILE" 2>&1
-    exit_status=$?
+
+    local exit_status=$?
 
     if [ $exit_status -eq 0 ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer successful." >> "$LOG_FILE"
