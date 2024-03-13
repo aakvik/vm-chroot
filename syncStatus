@@ -38,7 +38,7 @@ chroot_success=$(check_success "$chrootlog")
 difference_transferlog=$(time_difference "$transferlog")
 difference_chrootlog=$(time_difference "$chrootlog")
 
-if [ $difference_transferlog -lt 60 ] && [ $transfer_process -gt 0 ]; then
+if [ $difference_transferlog -lt 600 ] && [ $transfer_process -gt 0 ]; then
     echo "INFO : Active transfer job running"
     exit 69
 elif [ $transfer_process -eq 0 ] && [ $transfer_success -gt 0 ]; then
@@ -49,7 +49,7 @@ else
     exit 1
 fi
 
-if [ $difference_chrootlog -lt 60 ] && [ $chroot_process -gt 0 ]; then
+if [ $difference_chrootlog -lt 600 ] && [ $chroot_process -gt 0 ]; then
     echo "INFO : Active chroot job running"
     exit 69
 elif [ $chroot_process -eq 0 ] && [ "$chroot_success" -gt 0 ]; then
