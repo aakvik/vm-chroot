@@ -8,9 +8,11 @@ check_process() {
     ps aux | grep "[${process_name:0:1}]${process_name:1}" | wc -l
 }
 
+
+
 check_success() {
     local log_file="$1"
-    local success_message="volume update completed successfully"
+    local success_message="success"
     if [ -f "$log_file" ] && [ -s "$log_file" ]; then
         grep -c "$success_message" "$log_file"
     else
@@ -31,20 +33,29 @@ time_difference() {
 
 transfer_process=$(check_process "vm-transfer")
 chroot_process=$(check_process "vm-chroot")
-success=$(check_success "$chrootlog")
+transfer_success=$(check_success "$transferlog")
+chroot_success=$(check_success "$chrootlog")
 difference_transferlog=$(time_difference "$transferlog")
 difference_chrootlog=$(time_difference "$chrootlog")
 
-if [ $difference_transferlog -lt 600 ] && [ $transfer_process -gt 0 ]; then
+if [ $difference_transferlog -lt 60 ] && [ $transfer_process -gt 0 ]; then
     echo "INFO : Active transfer job running"
     exit 69
-elif [ $difference_chrootlog -lt 600 ] && [ $chroot_process -gt 0 ]; then
-    echo "INFO : Active chroot job running"
-    exit 69
-elif [ $transfer_process -eq 0 ] && [ $chroot_process -eq 0 ] && [ "$success" -gt 0 ]; then
-    echo "INFO : Job completed successfully"
+elif [ $transfer_process -eq 0 ] && [ $transfer_success -gt 0 ]; then
+    echo "INFO : Transfer job completed"
     exit 0
 else
-    echo "INFO : No active jobs"
+    echo "ERROR : Transfer job failed"
+    exit 1
+fi
+
+if [ $difference_chrootlog -lt 60 ] && [ $chroot_process -gt 0 ]; then
+    echo "INFO : Active chroot job running"
+    exit 69
+elif [ $chroot_process -eq 0 ] && [ "$chroot_success" -gt 0 ]; then
+    echo "INFO : Chroot job completed"
+    exit 0
+else
+    echo "ERROR : Chroot job failed"
     exit 1
 fi

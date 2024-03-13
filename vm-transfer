@@ -16,6 +16,13 @@ transfer_data() {
     $sshlocal -i "$sshkey" root@"$hypervisor" \
         "$ddremote" if="$spath" bs=4M status=progress | \
         "$ddlocal" of="$tpath" bs=4M status=progress > "$LOG_FILE" 2>&1
+    exit_status=$?
+
+    if [ $exit_status -eq 0 ]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer successful." >> "$LOG_FILE"
+    else
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer failed with exit status $exit_status." >> "$LOG_FILE"
+    fi
 }
 
 hypervisor=""
@@ -77,6 +84,3 @@ if [[ -z "$sshkey" ]] || [ ! -f "$sshkey" ]; then
 fi
 
 transfer_data "$hypervisor" "$spath" "$tpath" "$sshkey"
-
-parent_script_path=$(dirname "$0")
-/bin/bash "$parent_script_path/vm-chroot"
