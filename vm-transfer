@@ -34,10 +34,10 @@ tpath="/dev/vdb"
 sshkey=""
 
 options="Available options:
-  --hypervisor | -H : Specify the hypervisor address.
-  --spath      | -S : Specify the source path for the data to be transferred.
-  --tpath      | -T : Specify the target path where the data will be transferred.
-  --sshkey     | -K : Specify the SSH key path for authentication."
+    --hypervisor | -H : Specify the hypervisor address.
+    --spath      | -S : Specify the source path for the data to be transferred.
+    --tpath      | -T : Specify the target path where the data will be transferred.
+    --sshkey     | -K : Specify the SSH key path for authentication."
 
 while [[ $# -gt 0 ]]; do
     case "$1" in

@@ -5,78 +5,84 @@ LOG_FILE="/var/log/vm-chroot.log"
 > "$LOG_FILE"
 
 log() {
-	local message="$1"
-	local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+	  local message="$1"
+	  local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
-    	echo "$timestamp - $message"
+    echo "$timestamp - $message"
 
-    	echo "$timestamp - $message" >> "$LOG_FILE"
+   	echo "$timestamp - $message" >> "$LOG_FILE"
 }
 
 check_exit_status() {
-	local exit_code="$1"
-	local expected_code="$2"
+    local exit_code="$1"
+    local expected_code="$2"
 
-	if [ "$exit_code" -eq "$expected_code" ]; then
-		log "Success: Got expected exit status code $expected_code"
-        	return 0
-	else
-		log "Error: Expected exit status code $expected_code, but received $exit_code"
-        	return 1
-	fi
+    if [ "$exit_code" -eq "$expected_code" ]; then
+        log "Success: Got expected exit status code $expected_code"
+          	return 0
+  	else
+        log "Error: Expected exit status code $expected_code, but received $exit_code"
+          	return 1
+    fi
+}
+
+unmount_chroot() {
+	  log "unmounting chroot: "
+
+	  for i in dev proc sys run
+	  do
+        	/usr/bin/umount /mnt/$i
+	  done &&
+
+	  /usr/bin/umount /mnt || /usr/bin/umount -l /mnt
+
+    check_exit_status "$?" 0 || return 1
+    log "unmounted chroot successfully"
 }
 
 mount_chroot() {
-    	log "mounting chroot: "
-    	
-    	local rootpath=$(blkid|grep mapper|grep root| awk '{print $1}' | sed -e 's/:$//')
+    log "Mounting chroot: "
 
-	[[ -z "$rootpath" ]] && { echo "Could not find root path" ; exit 1; }
+    local rootpath=""
 
-    	/usr/bin/mount $rootpath /mnt &&
+    lvscan &>/dev/null
+    if [ $? -eq 0 ]; then
+        rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE /dev/vdb | grep lvm | sort -k2 -n -r | head -n1 | awk '{print $1}')
+    else
+        rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE /dev/vdb| grep -E "vdb[1-9][0-9]{0,2}" | sort -k2 -n -r | head -n1 | awk '{print $1}')
+        [[ -z "$rootpath" ]] && { log "Could not find root path" ; return 1; }
+    fi
 
-    	for i in dev proc sys run
-    	do
-    		/usr/bin/mount --bind /$i /mnt/$i
-    	done
-    	
-    	check_exit_status "$?" 0 || return 1
-    	log "mounted chroot successfully"
+    /usr/bin/mount "$rootpath" /mnt &&
+
+    for i in dev proc sys run
+    do
+        /usr/bin/mount --bind "/$i" "/mnt/$i"
+    done
+
+    check_exit_status "$?" 0 || { unmount_chroot; return 1; }
+    log "Mounted chroot successfully"
 }
 
 update_chroot() {
     local parent_script_path=$(dirname "$0")
-	log "updating chroot: "
+    log "updating chroot: "
 
-	apt-get install ansible -y &&
-	/usr/bin/ansible-playbook -i /mnt, $parent_script_path/playbook.yaml
+    apt-get install ansible -y &&
+    /usr/bin/ansible-playbook -i /mnt, $parent_script_path/playbook.yaml
 
-    	check_exit_status "$?" 0 || return 1
-    	log "updated chroot successfully"
-}
-
-unmount_chroot() {
-	log "unmounting chroot: "
-
-	for i in dev proc sys run
-	do
-        	/usr/bin/umount /mnt/$i
-	done &&
-
-	/usr/bin/umount /mnt || /usr/bin/umount -l /mnt
-
-    	check_exit_status "$?" 0 || return 1
-    	log "unmounted chroot successfully"
+    check_exit_status "$?" 0 || { unmount_chroot; return 1; }
+    log "updated chroot successfully"
 }
 
 main() {
-	log "starting volume update..."
-	
-	mount_chroot || { echo "Error in mount_chroot"; exit 1; }
-	update_chroot || { echo "Error in update_chroot"; exit 1; }
-	unmount_chroot || { echo "Error in unmount_chroot"; exit 1; }
-	
-	log "volume update completed successfully"
+    log "starting volume update..."
+
+    mount_chroot || { echo "Error in mount_chroot"; exit 1; }
+    update_chroot || { echo "Error in update_chroot"; exit 1; }
+    unmount_chroot || { echo "Error in unmount_chroot"; exit 1; }
+
+    log "volume update completed successfully"
 }
 
 main
