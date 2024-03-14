@@ -2,7 +2,7 @@
 
 set -o pipefail
 
-LOG_FILE="/var/log/vm-transfer.log"
+LOG_FILE="/var/log/transfer.log"
 > "$LOG_FILE"
 
 transfer_data() {

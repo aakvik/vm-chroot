@@ -1,7 +1,7 @@
 #!/bin/bash
 
-transferlog="/var/log/vm-transfer.log"
-chrootlog="/var/log/vm-chroot.log"
+transferlog="/var/log/transfer.log"
+chrootlog="/var/log/chroot.log"
 
 check_process() {
     local process_name="$1"
