@@ -23,6 +23,9 @@ transfer_data() {
 
     if [ $exit_status -eq 0 ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer successful." >> "$LOG_FILE"
+        if [ -n "$callback" ]; then
+            curl -s $callback" > /dev/null
+        fi
     else
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer failed with exit status $exit_status." >> "$LOG_FILE"
     fi
@@ -32,12 +35,14 @@ hypervisor=""
 spath=""
 tpath="/dev/vdb"
 sshkey=""
+callback=""
 
 options="Available options:
     --hypervisor | -H : Specify the hypervisor address.
     --spath      | -S : Specify the source path for the data to be transferred.
     --tpath      | -T : Specify the target path where the data will be transferred.
-    --sshkey     | -K : Specify the SSH key path for authentication."
+    --sshkey     | -K : Specify the SSH key path for authentication.
+    --callback   | -C : Specify the callback URL to hit on successful transfer."
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -56,6 +61,10 @@ while [[ $# -gt 0 ]]; do
         --sshkey | -K)
             shift
             sshkey="$1"
+            ;;
+        --callback | -C)
+            shift
+            callback="$1"
             ;;
         *)
             echo "Unknown option: $1"
