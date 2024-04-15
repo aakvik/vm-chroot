@@ -24,7 +24,7 @@ transfer_data() {
     if [ $exit_status -eq 0 ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer successful." >> "$LOG_FILE"
         if [ -n "$callback" ]; then
-            curl -s $callback" > /dev/null
+            curl -s "$callback" > /dev/null
         fi
     else
         echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer failed with exit status $exit_status." >> "$LOG_FILE"
@@ -95,4 +95,4 @@ if [[ -z "$sshkey" ]] || [ ! -f "$sshkey" ]; then
     exit 1
 fi
 
-transfer_data "$hypervisor" "$spath" "$tpath" "$sshkey"
+transfer_data "$hypervisor" "$spath" "$tpath" "$sshkey" "$callback"
