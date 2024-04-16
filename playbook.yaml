@@ -22,11 +22,14 @@
       state: absent
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+  - name: update repo if ubuntu
+    ansible.builtin.shell: apt-get update
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
   - name: update cloud-init if ubuntu
     apt:
       name: cloud-init
       state: latest
-      update_cache: yes
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
   - name: update cloud-init if centos
