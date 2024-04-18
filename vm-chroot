@@ -8,9 +8,7 @@ log() {
 	  local message="$1"
 	  local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
-    echo "$timestamp - $message"
-
-   	echo "$timestamp - $message" >> "$LOG_FILE"
+    echo "$timestamp - $message" | tee -a "$LOG_FILE"
 }
 
 check_exit_status() {
@@ -18,10 +16,10 @@ check_exit_status() {
     local expected_code="$2"
 
     if [ "$exit_code" -eq "$expected_code" ]; then
-        log "Success: Got expected exit status code $expected_code"
+        log "OK: Got expected exit status code $expected_code"
           	return 0
   	else
-        log "Error: Expected exit status code $expected_code, but received $exit_code"
+        log "Err: Expected exit status code $expected_code, but received $exit_code"
           	return 1
     fi
 }
@@ -39,21 +37,22 @@ unmount_chroot() {
     vgchange -an
 
     check_exit_status "$?" 0 || return 1
-    log "unmounted chroot successfully"
+    log "Chroot unmount completed"
 }
 
 mount_chroot() {
     log "Mounting chroot: "
 
+    local tpath=$(cat /tmp/target_disk)
     local rootpath=""
 
     vgchange -ay
 
     lvscan_output=$(lvscan)
     if echo "$lvscan_output" | grep -q "ACTIVE"; then
-        rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE /dev/vdb | grep lvm | sort -k2 -n -r | head -n1 | awk '{print $1}')
+        rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE $tpath | grep lvm | sort -k2 -n -r | head -n1 | awk '{print $1}')
     else
-        rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE /dev/vdb| grep -E "vdb[1-9][0-9]{0,2}" | sort -k2 -n -r | head -n1 | awk '{print $1}')
+        rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE $tpath | grep -E "vd*.[1-9][0-9]{0,2}" | sort -k2 -n -r | head -n1 | awk '{print $1}')
         [[ -z "$rootpath" ]] && { log "Could not find root path" ; return 1; }
     fi
 
@@ -65,7 +64,7 @@ mount_chroot() {
     done
 
     check_exit_status "$?" 0 || { unmount_chroot; return 1; }
-    log "Mounted chroot successfully"
+    log "Chroot mount completed"
 }
 
 update_chroot() {
@@ -76,15 +75,15 @@ update_chroot() {
     /usr/bin/ansible-playbook -i /mnt, $parent_script_path/playbook.yaml
 
     check_exit_status "$?" 0 || { unmount_chroot; return 1; }
-    log "updated chroot successfully"
+    log "Chroot update completed"
 }
 
 main() {
     log "starting volume update..."
 
-    mount_chroot || { echo "Error in mount_chroot"; exit 1; }
-    update_chroot || { echo "Error in update_chroot"; exit 1; }
-    unmount_chroot || { echo "Error in unmount_chroot"; exit 1; }
+    mount_chroot || { log "Error in mount_chroot"; exit 1; }
+    update_chroot || { log "Error in update_chroot"; exit 1; }
+    unmount_chroot || { log "Error in unmount_chroot"; exit 1; }
 
     log "volume update completed successfully"
 }
