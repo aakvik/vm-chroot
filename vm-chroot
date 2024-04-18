@@ -34,7 +34,9 @@ unmount_chroot() {
         	/usr/bin/umount /mnt/$i
 	  done &&
 
-	  /usr/bin/umount /mnt || /usr/bin/umount -l /mnt
+	  /usr/bin/umount /mnt || /usr/bin/umount -l /mnt &&
+
+    vgchange -an
 
     check_exit_status "$?" 0 || return 1
     log "unmounted chroot successfully"
