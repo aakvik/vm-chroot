@@ -47,6 +47,8 @@ mount_chroot() {
 
     local rootpath=""
 
+    vgchange -ay
+
     lvscan_output=$(lvscan)
     if echo "$lvscan_output" | grep -q "ACTIVE"; then
         rootpath=$(lsblk -b -p -l -o NAME,SIZE,TYPE /dev/vdb | grep lvm | sort -k2 -n -r | head -n1 | awk '{print $1}')
