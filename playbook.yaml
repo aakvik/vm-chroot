@@ -30,8 +30,8 @@
       dest: /etc/resolv.conf.bak
 
   - name: create /etc/resolv.conf
-    file:
-      path: resolv.conf
+    copy:
+      src: resolv.conf
       dest: /etc/resolv.conf
 
   - name: update repo if ubuntu
