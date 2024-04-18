@@ -22,6 +22,18 @@
       state: absent
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+
+  - name: move /etc/resolv.conf temporarily
+    copy:
+      remote_src: true
+      src: /etc/resolv.conf
+      dest: /etc/resolv.conf.bak
+
+  - name: create /etc/resolv.conf
+    file:
+      path: resolv.conf
+      dest: /etc/resolv.conf
+
   - name: update repo if ubuntu
     ansible.builtin.shell: apt-get update
     when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -47,3 +59,9 @@
       path: /etc/cloud/cloud.cfg
       regexp: '^preserve_hostname: false$'
       replace: 'preserve_hostname: true'
+
+  - name: reset resolv.conf
+    copy:
+      remote_src: true
+      src: /etc/resolv.conf.bak
+      dest: /etc/resolv.conf
