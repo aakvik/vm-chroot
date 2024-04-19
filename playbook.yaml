@@ -28,10 +28,8 @@
       register: stat_result
 
     - name: move /etc/resolv.conf temporarily
-      copy:
-        remote_src: true
-        src: /etc/resolv.conf
-        dest: /etc/resolv.conf.bak
+      command:
+        cmd: mv /etc/resolv.conf /etc/resolv.conf.bak
       when: stat_result.stat.exists
 
     - name: create /etc/resolv.conf
@@ -40,7 +38,7 @@
         dest: /etc/resolv.conf
 
     - name: update repo if ubuntu
-      ansible.builtin.shell: apt-get update
+      shell: apt-get update
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
     - name: update cloud-init if ubuntu
@@ -66,8 +64,6 @@
         replace: "preserve_hostname: true"
 
     - name: reset resolv.conf
-      copy:
-        remote_src: true
-        src: /etc/resolv.conf.bak
-        dest: /etc/resolv.conf
+      command:
+        cmd: mv /etc/resolv.conf.bak /etc/resolv.conf
       when: stat_result.stat.exists
