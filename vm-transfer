@@ -3,37 +3,37 @@
 set -o pipefail
 
 LOG_FILE="/var/log/transfer.log"
-> "$LOG_FILE"
-
+>"$LOG_FILE"
 
 if [[ -f /var/log/chroot.log ]]; then
-    rm /var/log/chroot.log
+	rm /var/log/chroot.log
 fi
 
 transfer_data() {
-    local hypervisor="$1"
-    local spath="$2"
-    local tpath="$3"
-    local sshkey="$4"
+	local hypervisor="$1"
+	local spath="$2"
+	local tpath="$3"
+	local sshkey="$4"
+	local callback="$5"
 
-    local sshlocal=$(which ssh)
-    local ddlocal=$(which dd)
-    local ddremote=$(ssh -i "$sshkey" root@"$hypervisor" which dd)
+	local sshlocal=$(which ssh)
+	local ddlocal=$(which dd)
+	local ddremote=$(ssh -i "$sshkey" root@"$hypervisor" which dd)
 
-    $sshlocal -i "$sshkey" root@"$hypervisor" \
-        "$ddremote" if="$spath" bs=4M status=progress | \
-        "$ddlocal" of="$tpath" bs=4M status=progress > "$LOG_FILE" 2>&1
+	$sshlocal -i "$sshkey" root@"$hypervisor" \
+		"$ddremote" if="$spath" bs=4M status=progress |
+		"$ddlocal" of="$tpath" bs=4M status=progress >"$LOG_FILE" 2>&1
 
-    local exit_status=$?
+	local exit_status=$?
 
-    if [ "$exit_status" -eq 0 ]; then
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer successful." >> "$LOG_FILE"
-        if [ -n "$callback" ]; then
-            curl -s "$callback" > /dev/null
-        fi
-    else
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer failed with exit status $exit_status." >> "$LOG_FILE"
-    fi
+	if [ "$exit_status" -eq 0 ]; then
+		echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer successful." >>"$LOG_FILE"
+		if [ -n "$callback" ]; then
+			curl -s "$callback" >/dev/null
+		fi
+	else
+		echo "$(date '+%Y-%m-%d %H:%M:%S') - Transfer failed with exit status $exit_status." >>"$LOG_FILE"
+	fi
 }
 
 hypervisor=""
@@ -50,62 +50,62 @@ options="Available options:
     --callback   | -C : Specify the callback URL to hit on successful transfer."
 
 while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --hypervisor | -H)
-            shift
-            hypervisor="$1"
-            ;;
-        --spath | -S)
-            shift
-            spath="$1"
-            ;;
-        --tpath | -T)
-            shift
-            tpath="$1"
-            ;;
-        --sshkey | -K)
-            shift
-            sshkey="$1"
-            ;;
-        --callback | -C)
-            shift
-            callback="$1"
-            ;;
-        *)
-            echo "Unknown option: $1"
-	    echo "$options"
-            exit 1
-            ;;
-    esac
-    shift
+	case "$1" in
+	--hypervisor | -H)
+		shift
+		hypervisor="$1"
+		;;
+	--spath | -S)
+		shift
+		spath="$1"
+		;;
+	--tpath | -T)
+		shift
+		tpath="$1"
+		;;
+	--sshkey | -K)
+		shift
+		sshkey="$1"
+		;;
+	--callback | -C)
+		shift
+		callback="$1"
+		;;
+	*)
+		echo "Unknown option: $1"
+		echo "$options"
+		exit 1
+		;;
+	esac
+	shift
 done
 
 tpath=$(echo $tpath | head -c 20 | sed 's@^@/dev/disk/by-id/virtio-@')
 
 if [[ -f /tmp/target_disk ]]; then
-    rm /tmp/target_disk
+	rm /tmp/target_disk
 fi
 
-echo $tpath > /tmp/target_disk
+echo $tpath >/tmp/target_disk
 
 if [[ -z "$tpath" ]] || [[ ! -L "$tpath" ]]; then
-    echo "Target path not provided or does not exist, please provide the openstack UUID of the target volume."
-    exit 1
+	echo "Target path not provided or does not exist, please provide the openstack UUID of the target volume."
+	exit 1
 fi
 
 if [[ -z "$hypervisor" ]]; then
-    echo "Please provide hypervisor using --hypervisor or -H."
-    exit 1
+	echo "Please provide hypervisor using --hypervisor or -H."
+	exit 1
 fi
 
 if [[ -z "$spath" ]]; then
-    echo "Please provide source path using --spath or -S."
-    exit 1
+	echo "Please provide source path using --spath or -S."
+	exit 1
 fi
 
 if [[ -z "$sshkey" ]] || [ ! -f "$sshkey" ]; then
-    echo "SSH key path is not specified or does not exist. Please provide a valid sshkey using --sshkey or -K."
-    exit 1
+	echo "SSH key path is not specified or does not exist. Please provide a valid sshkey using --sshkey or -K."
+	exit 1
 fi
 
 transfer_data "$hypervisor" "$spath" "$tpath" "$sshkey" "$callback"
