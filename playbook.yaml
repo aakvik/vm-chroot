@@ -37,14 +37,22 @@
         src: resolv.conf
         dest: /etc/resolv.conf
 
+    - name: update /etc/apt/sources.list to old. if 10.04
+      copy:
+        src: apt/sources.list.10.04
+        dest: /etc/apt/sources.list
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "10.04"
+
     - name: update repo if ubuntu
       shell: apt-get update
+      ignore_errors: true
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
     - name: update cloud-init if ubuntu
       apt:
         name: cloud-init
         state: latest
+        force: yes
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
     - name: update cloud-init if centos
