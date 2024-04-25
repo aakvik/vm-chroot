@@ -57,7 +57,7 @@ mount_chroot() {
 	fi
 
 	/usr/bin/mount "$rootpath" /mnt &&
-		for i in dev proc sys run; do
+		for i in dev proc sys; do
 			/usr/bin/mount --bind "/$i" "/mnt/$i"
 		done
 
