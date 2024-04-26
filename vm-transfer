@@ -2,6 +2,8 @@
 
 set -o pipefail
 
+echo $$ >/tmp/transfer.pid
+
 LOG_FILE="/var/log/transfer.log"
 >"$LOG_FILE"
 
