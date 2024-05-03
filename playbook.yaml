@@ -28,8 +28,10 @@
       register: stat_result
 
     - name: remove immutable from /etc/resolv.conf
-      shell: if [[ -f /etc/resolv.conf ]]; then chattr -i /etc/resolv.conf; fi
-      when: stat_result.stat.exists
+      file:
+        path: /etc/resolv.conf
+        attributes: '-i'
+      when: stat_result.stat.exists and stat_result.stat.islnk == False
 
     - name: move /etc/resolv.conf temporarily
       command:
