@@ -27,6 +27,12 @@
         path: /etc/resolv.conf
       register: stat_result
 
+    - name: remove immutable from /etc/resolv.conf
+      file:
+        path: /etc/resolv.conf
+        attributes: '-i'
+      when: stat_result.stat.exists
+
     - name: move /etc/resolv.conf temporarily
       command:
         cmd: mv /etc/resolv.conf /etc/resolv.conf.bak
