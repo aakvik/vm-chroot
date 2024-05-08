@@ -2,61 +2,71 @@
 
 transferlog="/var/log/transfer.log"
 chrootlog="/var/log/chroot.log"
+transfer_pid_file="/tmp/transfer.pid"
+chroot_pid_file="/tmp/chroot.pid"
 
 check_process() {
-    local process_name="$1"
-    ps aux | grep "[${process_name:0:1}]${process_name:1}" | wc -l
+	local pid_file="$1"
+	if [ -f "$pid_file" ]; then
+		local pid=$(cat "$pid_file")
+		if [ -n "$pid" ] && [ -d "/proc/$pid" ]; then
+			echo 1
+		else
+			echo 0
+		fi
+	else
+		echo 0
+	fi
 }
 
 check_success() {
-    local log_file="$1"
-    local success_message="success"
-    if [ -f "$log_file" ] && [ -s "$log_file" ]; then
-        grep -c "$success_message" "$log_file"
-    else
-        echo 0
-    fi
+	local log_file="$1"
+	local success_message="success"
+	if [ -f "$log_file" ] && [ -s "$log_file" ]; then
+		grep -c "$success_message" "$log_file"
+	else
+		echo 0
+	fi
 }
 
 time_difference() {
-    local log_file="$1"
-    if [ -f "$log_file" ]; then
-        local current_time=$(date +%s)
-        local last_modification=$(stat -c %Y "$log_file")
-        echo $(( (current_time - last_modification) / 60 ))
-    else
-        echo 999999
-    fi
+	local log_file="$1"
+	if [ -f "$log_file" ]; then
+		local current_time=$(date +%s)
+		local last_modification=$(stat -c %Y "$log_file")
+		echo $(((current_time - last_modification) / 60))
+	else
+		echo 999999
+	fi
 }
 
-transfer_process=$(check_process "vm-transfer")
-chroot_process=$(check_process "vm-chroot")
+transfer_process=$(check_process "$transfer_pid_file")
+chroot_process=$(check_process "$chroot_pid_file")
 transfer_success=$(check_success "$transferlog")
 chroot_success=$(check_success "$chrootlog")
 difference_transferlog=$(time_difference "$transferlog")
 difference_chrootlog=$(time_difference "$chrootlog")
 
-
 if [ $difference_transferlog -lt 600 ] && [ $transfer_process -gt 0 ]; then
-    echo "INFO : Active transfer job running"
-    exit 69
+	echo "INFO : Active transfer job running"
+	exit 69
 elif [ $transfer_process -eq 0 ] && [ $transfer_success -gt 0 ]; then
-    echo "INFO : Transfer job completed"
+	echo "INFO : Transfer job completed"
 else
-    echo "ERROR : Transfer job failed"
-    exit 1
+	echo "ERROR : Transfer job failed"
+	exit 1
 fi
 
 if [[ ! -f $chrootlog ]]; then
-  exit 0
+	exit 0
 fi
 
 if [ $difference_chrootlog -lt 600 ] && [ $chroot_process -gt 0 ]; then
-    echo "INFO : Active chroot job running"
-    exit 69
-elif [ $chroot_process -eq 0 ] && [ "$chroot_success" -gt 0 ]; then
-    echo "INFO : Chroot job completed"
+	echo "INFO : Active chroot job running"
+	exit 69
+elif [ $chroot_process -eq 0 ] && [ $chroot_success -gt 0 ]; then
+	echo "INFO : Chroot job completed"
 else
-    echo "ERROR : Chroot job failed"
-    exit 1
+	echo "ERROR : Chroot job failed"
+	exit 1
 fi
