@@ -66,6 +66,10 @@
       ignore_errors: true
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+    - name: fix broken installs if present
+      shell: apt-get --fix-broken install -y
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
     - name: update cloud-init if ubuntu
       apt:
         name: cloud-init
