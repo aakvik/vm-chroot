@@ -49,6 +49,12 @@
         dest: /etc/apt/sources.list
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "10.04"
 
+    - name: update /etc/apt/sources.list to old. if 12.04
+      copy:
+        src: apt/sources.list.12.04
+        dest: /etc/apt/sources.list
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "12.04"
+
     - name: update /etc/apt/sources.list to old. if debian 9
       copy:
         src: apt/sources.list.debian.9
