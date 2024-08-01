@@ -1,0 +1,15 @@
+deb http://old-releases.ubuntu.com/ubuntu/ trusty main restricted
+deb-src http://old-releases.ubuntu.com/ubuntu/ trusty main restricted
+
+deb http://old-releases.ubuntu.com/ubuntu/ trusty-updates main restricted
+deb-src http://old-releases.ubuntu.com/ubuntu/ trusty-updates main restricted
+
+deb http://old-releases.ubuntu.com/ubuntu/ trusty universe
+deb-src http://old-releases.ubuntu.com/ubuntu/ trusty universe
+deb http://old-releases.ubuntu.com/ubuntu/ trusty-updates universe
+deb-src http://old-releases.ubuntu.com/ubuntu/ trusty-updates universe
+
+deb http://old-releases.ubuntu.com/ubuntu/ trusty multiverse
+deb-src http://old-releases.ubuntu.com/ubuntu/ trusty multiverse
+deb http://old-releases.ubuntu.com/ubuntu/ trusty-updates multiverse
+deb-src http://old-releases.ubuntu.com/ubuntu/ trusty-updates multiverse

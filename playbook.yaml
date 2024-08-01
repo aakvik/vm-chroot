@@ -61,6 +61,24 @@
         dest: /etc/apt/sources.list
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "12.04"
 
+    - name: update /etc/apt/sources.list to old. if 14.04
+      copy:
+        src: apt/sources.list.14.04
+        dest: /etc/apt/sources.list
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "14.04"
+
+    - name: update /etc/apt/sources.list to old. if 16.04
+      copy:
+        src: apt/sources.list.16.04
+        dest: /etc/apt/sources.list
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "16.04"
+
+    - name: update /etc/apt/sources.list to old. if 18.04
+      copy:
+        src: apt/sources.list.18.04
+        dest: /etc/apt/sources.list
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "18.04"
+
     - name: update /etc/apt/sources.list to old. if debian 9
       copy:
         src: apt/sources.list.debian.9
@@ -84,7 +102,7 @@
         update_cache: no
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-    - name: update CentOS-Base.repo to vault if CentOS7
+    - name: update CentOS-Base.repo to vault if CentOS7.6
       copy:
         src: yum/CentOS-Base.repo7.6
         dest: /etc/yum.repos.d/CentOS-Base.repo
