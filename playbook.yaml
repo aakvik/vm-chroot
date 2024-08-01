@@ -78,6 +78,14 @@
         update_cache: no
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
+    - name: update cloud-init if ubuntu
+      apt:
+        name: netplan.io
+        state: latest
+        force: yes
+        update_cache: no
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
     - name: update CentOS-Base.repo to vault if CentOS7
       copy:
         src: yum/CentOS-Base.repo7.6
