@@ -26,7 +26,7 @@
       copy:
         src: etc/network/interfaces
         dest: /etc/network/interfaces
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('16.04', '<')
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('16.04', '<=')
 
     - name: check if /etc/resolv.conf exists in chroot
       stat:
