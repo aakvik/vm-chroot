@@ -1,15 +1,4 @@
-deb http://old-releases.ubuntu.com/ubuntu/ bionic main restricted
-deb-src http://old-releases.ubuntu.com/ubuntu/ bionic main restricted
-
-deb http://old-releases.ubuntu.com/ubuntu/ bionic-updates main restricted
-deb-src http://old-releases.ubuntu.com/ubuntu/ bionic-updates main restricted
-
-deb http://old-releases.ubuntu.com/ubuntu/ bionic universe
-deb-src http://old-releases.ubuntu.com/ubuntu/ bionic universe
-deb http://old-releases.ubuntu.com/ubuntu/ bionic-updates universe
-deb-src http://old-releases.ubuntu.com/ubuntu/ bionic-updates universe
-
-deb http://old-releases.ubuntu.com/ubuntu/ bionic multiverse
-deb-src http://old-releases.ubuntu.com/ubuntu/ bionic multiverse
-deb http://old-releases.ubuntu.com/ubuntu/ bionic-updates multiverse
-deb-src http://old-releases.ubuntu.com/ubuntu/ bionic-updates multiverse
+deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse
+deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu/ bionic-updates main restricted universe multiverse
+deb [arch=amd64,i386] http://us.archive.ubuntu.com/ubuntu/ bionic-backports main restricted universe multiverse
+deb [arch=amd64,i386] http://security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse
