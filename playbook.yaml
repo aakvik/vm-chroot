@@ -121,6 +121,12 @@
         dest: /etc/yum.repos.d/CentOS-Base.repo
       when: ansible_distribution == 'CentOS' and ansible_distribution_version == "7.6"
 
+    - name: update CentOS-Base.repo to vault if CentOS7.6
+      copy:
+        src: yum/CentOS-Base.repo7.9
+        dest: /etc/yum.repos.d/CentOS-Base.repo
+      when: ansible_distribution == 'CentOS' and ansible_distribution_version == "7.9"
+
     - name: update cloud-init if centos
       yum:
         name: cloud-init
