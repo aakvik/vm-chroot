@@ -22,11 +22,17 @@
         state: absent
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-    - name: insert interface file if ubuntu is 16.04 or older
+    - name: insert interface file if ubuntu is 16.04
       copy:
         src: etc/network/interfaces
         dest: /etc/network/interfaces
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('16.04', '<=')
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "16.04"
+
+    - name: insert interface file if ubuntu is older than 16.04
+      copy:
+        src: etc/network/interfaces.old
+        dest: /etc/network/interfaces
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('14.04', '<=')
 
     - name: check if /etc/resolv.conf exists in chroot
       stat:
