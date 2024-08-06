@@ -115,13 +115,9 @@
         update_cache: yes
       when: ansible_distribution == 'CentOS'
 
-    - name: run cloud-init init if old OS
-      shell: cloud-init init
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('16.04', '<')
-
     - name: run cloud-init clean
       shell: cloud-init clean
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('14.04', '>')
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('16.04', '>')
 
     - name: run cloud-init clean CentOS
       shell: cloud-init clean
