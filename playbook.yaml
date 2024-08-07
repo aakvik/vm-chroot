@@ -41,6 +41,12 @@
         dest: /etc/network/interfaces
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('14.04', '<=')
 
+    - name: insert interface file if ubuntu is older than 12.04 and does not support dhcp6
+      copy:
+        src: etc/network/interfaces.older
+        dest: /etc/network/interfaces
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('10.04', '<=')
+
     - name: check if /etc/resolv.conf exists in chroot
       stat:
         path: /etc/resolv.conf
