@@ -158,3 +158,8 @@
       command:
         cmd: mv /etc/resolv.conf.bak /etc/resolv.conf
       when: stat_result.stat.exists
+      
+    - name: recreate resolvconf symlink for 12.04 to avoid resolv.conf race condition
+      command:
+        cmd: ln -nsf ../run/resolvconf/resolv.conf /etc/resolv.conf
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == "12.04"
