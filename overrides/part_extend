@@ -1,0 +1,6 @@
+#!/bin/bash
+
+growpart $1 1
+resize2fs $2
+pvresize $2
+lvresize -l +100%FREE $3

@@ -87,6 +87,11 @@ update_chroot() {
 main() {
 	log "starting volume update..."
 
+	[[ "$1" == "241865" ]] && ./overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root || {
+    log "Failed to extend partition"
+    exit 1
+  }
+
 	mount_chroot || {
 		log "Error in mount_chroot"
 		exit 1
