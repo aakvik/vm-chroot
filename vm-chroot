@@ -87,7 +87,7 @@ update_chroot() {
 main() {
 	log "starting volume update..."
 
-  [[ "$1" == "241865" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root
+  [[ "$1" == "241865" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
 
 	mount_chroot || {
 		log "Error in mount_chroot"
