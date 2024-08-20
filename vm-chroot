@@ -93,6 +93,7 @@ main() {
 	}
 
   [[ "$1" == "241865" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
+  [[ "$1" == "238442" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
 
 	update_chroot || {
 		log "Error in update_chroot"
