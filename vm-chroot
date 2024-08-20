@@ -3,6 +3,7 @@
 echo $$ >/tmp/chroot.pid
 
 LOG_FILE="/var/log/chroot.log"
+SCRIPT_PATH=$(dirname "$0")
 
 >"$LOG_FILE"
 
@@ -71,11 +72,10 @@ mount_chroot() {
 }
 
 update_chroot() {
-	local parent_script_path=$(dirname "$0")
 	log "updating chroot: "
 
 	apt-get install ansible -y &&
-		/usr/bin/ansible-playbook -i /mnt, $parent_script_path/playbook.yaml
+		/usr/bin/ansible-playbook -i /mnt, $SCRIPT_PATH/playbook.yaml
 
 	check_exit_status "$?" 0 || {
 		unmount_chroot
@@ -87,10 +87,7 @@ update_chroot() {
 main() {
 	log "starting volume update..."
 
-	[[ "$1" == "241865" ]] && ./overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root || {
-    log "Failed to extend partition"
-    exit 1
-  }
+  [[ "$1" == "241865" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root
 
 	mount_chroot || {
 		log "Error in mount_chroot"
