@@ -2,7 +2,14 @@
 
 set -o pipefail
 
-echo $$ >/tmp/transfer.pid
+PID_FILE="/tmp/transfer.pid"
+
+if [[ -f "$PID_FILE" ]] && kill -0 $(cat "$PID_FILE") 2>/dev/null; then
+	echo "Transfer is already running."
+	exit 0
+fi
+
+echo $$ >"$PID_FILE"
 
 LOG_FILE="/var/log/transfer.log"
 >"$LOG_FILE"
