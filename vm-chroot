@@ -92,8 +92,9 @@ main() {
 		exit 1
 	}
 
-  [[ "$1" == "241865" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
-  [[ "$1" == "238442" ]] && $SCRIPT_PATH/overrides/part_extend /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
+	if [[ "$1" == "241865" || "$1" == "238442" ]]; then
+		"$SCRIPT_PATH/overrides/part_extend" /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
+	fi
 
 	update_chroot || {
 		log "Error in update_chroot"
@@ -107,4 +108,4 @@ main() {
 	log "volume update completed successfully"
 }
 
-main
+main "$@"
