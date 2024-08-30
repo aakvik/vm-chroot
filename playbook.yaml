@@ -68,6 +68,10 @@
         src: resolv.conf
         dest: /etc/resolv.conf
 
+    - name: clean apt cache
+      shell: apt-get clean
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
     - name: update /etc/apt/sources.list to old. if 10.04
       copy:
         src: apt/sources.list.10.04
