@@ -108,22 +108,29 @@
         dest: /etc/apt/sources.list
       when: ansible_distribution == 'Debian' and ansible_distribution_major_version == "9"
 
-    - name: update repo if ubuntu
+    - name: update repo if ubuntu or debian
       shell: apt-get -o Dir::Etc::SourceParts=/etc/apt/sources.list update
       ignore_errors: true
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-    - name: fix broken installs if present
-      shell: apt-get --fix-broken install -y
+    - name: Download cloud-init package using apt-get --download-only
+      shell: apt-get install -y --download-only cloud-init
+      args:
+        warn: false
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
-    - name: update cloud-init if ubuntu
-      apt:
-        name: cloud-init
-        state: latest
-        force: yes
-        update_cache: no
+    - name: Get list of downloaded deb files
+      find:
+        paths: /var/cache/apt/archives/
+        patterns: "*.deb"
+      register: deb_files
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+    - name: Install all downloaded .deb files using dpkg --recursive
+      shell: dpkg -iR /var/cache/apt/archives/
+      args:
+        warn: false
+      when: deb_files.matched > 0 and (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu')
 
     - name: update CentOS-Base.repo to vault if CentOS7.6
       copy:
@@ -162,7 +169,7 @@
       command:
         cmd: mv /etc/resolv.conf.bak /etc/resolv.conf
       when: stat_result.stat.exists
-      
+
     - name: recreate resolvconf symlink for 12.04 to avoid resolv.conf race condition
       command:
         cmd: ln -nsf ../run/resolvconf/resolv.conf /etc/resolv.conf
