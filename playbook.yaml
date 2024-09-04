@@ -47,11 +47,11 @@
         dest: /etc/network/interfaces
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('10.04', '<=')
 
-    - name: insert interface file if debian is older than 12 (netplan default from 12)
+    - name: insert interface file if debian
       copy:
         src: etc/network/interfaces
         dest: /etc/network/interfaces
-      when: ansible_distribution == 'Debian' and ansible_distribution_major_version('11', '<=')"
+      when: ansible_distribution == 'Debian'
 
     - name: check if /etc/resolv.conf exists in chroot
       stat:
