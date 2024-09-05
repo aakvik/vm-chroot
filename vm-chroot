@@ -94,6 +94,8 @@ main() {
 
 	if [[ "$1" == "241865" || "$1" == "238442" || "$1" == "281188" ]]; then
 		"$SCRIPT_PATH/overrides/part_extend" /dev/vdb /dev/vdb1 /dev/hwraid/root /dev/mapper/hwraid-root
+	elif [[ "$1" == "246317" ]]; then
+		/usr/bin/ansible-playbook -i /mnt, "$SCRIPT_PATH/overrides/fix_apt.yaml"
 	fi
 
 	update_chroot || {

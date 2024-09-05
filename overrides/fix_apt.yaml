@@ -1,0 +1,15 @@
+---
+- hosts: all
+  connection: chroot
+  tasks:
+    - name: remove broken pkgs
+      apt:
+        pkg:
+          - linux-image-4.4.0-81-generic
+          - linux-image-4.4.0-83-generic
+          - linux-image-4.4.0-87-generic
+          - linux-image-extra-4.4.0-81-generic
+          - linux-image-extra-4.4.0-83-generic
+          - linux-image-extra-4.4.0-87-generic
+        state: absent
+        purge: true
