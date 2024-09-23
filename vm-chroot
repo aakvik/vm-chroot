@@ -98,6 +98,10 @@ main() {
 		/usr/bin/ansible-playbook -i /mnt, "$SCRIPT_PATH/overrides/fix_apt.yaml"
 	fi
 
+	if [[ "$1" == "241865" ]]; then
+		/usr/bin/ansible-playbook -i /mnt, "$SCRIPT_PATH/overrides/force_apt.yaml"
+	fi
+
 	update_chroot || {
 		log "Error in update_chroot"
 		exit 1
