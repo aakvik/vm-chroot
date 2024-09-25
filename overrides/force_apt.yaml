@@ -1,0 +1,7 @@
+---
+- hosts: all
+  connection: chroot
+  tasks:
+    - name: apt-get install -y -f
+      shell: apt-get install -y -f
+      ignore_errors: true
