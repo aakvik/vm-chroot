@@ -57,6 +57,12 @@
         dest: /etc/network/interfaces
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('14.04', '<=')
 
+    - name: insert interface file if debian
+      copy:
+        src: etc/network/interfaces
+        dest: /etc/network/interfaces
+      when: ansible_distribution == 'Debian'
+
     - name: check if /etc/resolv.conf exists in chroot
       stat:
         path: /etc/resolv.conf
