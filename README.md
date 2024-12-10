@@ -1,7 +1,7 @@
 # vm-sync
 A tool for syncing remote disk/image to local disk/image and reset cloud-init config via chroot
 
-Usage vm-transfer
+Usage vm-transfer:
 ```
 vm-transfer -H <hypervisor_address> -S <source_path> -T <target_path> -K <path_to_sshkey>
 
